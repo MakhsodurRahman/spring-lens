@@ -7,7 +7,7 @@ import RequestTracker from './src/assets/RequestTracker.js';
 $(document).ready(() => {
     const dataLoader = new DataLoader();
     const beanGraph = new BeanGraph(dataLoader);
-    const dashboard = new Dashboard();
+    const dashboard = new Dashboard(dataLoader);
     const requestTracker = new RequestTracker();
 
     // Configure routes and instantiate Router

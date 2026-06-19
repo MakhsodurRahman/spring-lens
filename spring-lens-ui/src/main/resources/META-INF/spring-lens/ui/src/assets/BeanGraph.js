@@ -48,6 +48,14 @@ export default class BeanGraph {
         this.update(null, { x: 0, y: 0, x0: 0, y0: 0 });
         this.fitView(0);
         this.setMode(this.mode);
+
+        if (window.focusBeanOnNextGraphEnter) {
+            const targetBean = window.focusBeanOnNextGraphEnter;
+            window.focusBeanOnNextGraphEnter = null;
+            setTimeout(() => {
+                this.focusOnBean(targetBean);
+            }, 300);
+        }
     }
 
     /**
