@@ -111,7 +111,7 @@ export class BeanTreeBuilder {
  * Responsible for loading, parsing, and building the hierarchical structure
  * of Spring bean definitions for D3.js visualization.
  */
-export default class DataLoader {
+export default class BeanDataLoader {
     /**
      * @param {string} [dataUrl] - The endpoint/path to fetch bean definitions from.
      */
