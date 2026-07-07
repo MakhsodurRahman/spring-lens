@@ -31,3 +31,12 @@
 #tip.show {
     display: block;
 }
+
+.submenu a {
+    display: block !important;
+}
+
+/* Selected bean row left border indicator */
+tr.bg-primary-light\/40 td:first-child {
+    border-left: 2px solid #6b46c1 !important;
+}

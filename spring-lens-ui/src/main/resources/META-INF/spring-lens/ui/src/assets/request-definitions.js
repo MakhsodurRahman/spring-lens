@@ -1,7 +1,7 @@
-import { requestsData } from './mockData.js';
+import { requestsData } from './mock-data.js';
 import { METHOD_PILL_STYLES, STATUS_PILL_STYLES, TEMPLATES } from "./constants.js";
 
-export default class RequestTracker {
+export default class RequestDefinitions {
     constructor() {
         this.initEvents();
     }

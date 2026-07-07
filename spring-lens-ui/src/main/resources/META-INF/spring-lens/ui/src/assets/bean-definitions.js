@@ -1,28 +1,26 @@
 import { TEMPLATES, BEAN_TYPE_RULES, SCOPE_COLORS, ROLE_COLORS, SCOPE_STYLES, DEFAULT_SCOPE_STYLE, DEPENDENCY_CATEGORY_COLORS } from './constants.js';
 import { getBeanCategory, nodeStyle } from './utils.js';
-import { BeanTreeBuilder } from './DataLoader.js';
+import { BeanTreeBuilder } from './bean-data-loader.js';
 
 /**
  * Controller class for the Beans Definitions dashboard tab.
  * Renders list tables, processes filters, aggregates bean metrics via Chart.js,
  * and manages detail sidebar selection.
  */
-export default class Dashboard {
-    /**
-     * @param {DataLoader} dataLoader - Shared data service instance.
-     */
+export default class BeanDefinitions {
+
     constructor(dataLoader) {
         this.dataLoader = dataLoader;
         this.charts = {
             scopeChart: null,
             roleChart: null
         };
-        
+
         // State variables
         this.beans = [];
         this.filteredBeans = [];
         this.searchQuery = '';
-        
+
         this.filters = {
             scope: '',
             role: '',
@@ -60,7 +58,7 @@ export default class Dashboard {
                 this.selectBean(this.beans[0].beanName);
             }
         } catch (error) {
-            console.error('Error in Dashboard enter:', error);
+            console.error('Error in BeanDefinitions enter:', error);
         }
     }
 
@@ -75,31 +73,34 @@ export default class Dashboard {
      * Populates filter dropdowns with unique options aggregated from the live dataset.
      */
     initFilterDropdowns() {
+        let $defFilterScope = $('#def-filter-scope');
+        let $defFilterRole = $('#def-filter-role');
+
         const scopes = new Set();
         const roles = new Set();
-        
+
         this.beans.forEach(bean => {
             if (bean.scope) scopes.add(bean.scope);
             if (bean.role) roles.add(bean.role);
         });
 
         this._populateDropdown(
-            $('#def-filter-scope'),
+            $defFilterScope,
             scopes,
             'Scope: All',
             scope => this._capitalize(scope)
         );
 
         this._populateDropdown(
-            $('#def-filter-role'),
+            $defFilterRole,
             roles,
             'Role: All',
             role => this._capitalize(role.replace(/^ROLE_/, ''))
         );
 
         // Sync dropdown selectors with active filter state
-        $('#def-filter-scope').val(this.filters.scope);
-        $('#def-filter-role').val(this.filters.role);
+        $defFilterScope.val(this.filters.scope);
+        $defFilterRole.val(this.filters.role);
         $('#def-filter-primary').val(this.filters.primary);
         $('#def-filter-lazy').val(this.filters.lazy);
         $('#def-filter-size').val(this.pageSize);
@@ -305,7 +306,7 @@ export default class Dashboard {
         if (this.searchQuery) {
             const query = this.searchQuery.toLowerCase();
             const searchableFields = [bean.beanName, bean.type, bean.contextId];
-            const hasMatch = searchableFields.some(field => 
+            const hasMatch = searchableFields.some(field =>
                 (field || '').toLowerCase().includes(query)
             );
             if (!hasMatch) {
@@ -393,7 +394,7 @@ export default class Dashboard {
 
         const rowsHtml = pageBeans.map(bean => {
             const displayName = BeanTreeBuilder._displayName(bean.beanName);
-            
+
             const cleanRole = (bean.role || '').replace(/^ROLE_/, '');
             const displayRole = cleanRole ? this._capitalize(cleanRole) : 'N/A';
             const displayScope = bean.scope ? this._capitalize(bean.scope) : 'N/A';
@@ -435,7 +436,7 @@ export default class Dashboard {
         const total = this.filteredBeans.length;
         const startIndex = total === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
         const endIndex = Math.min(startIndex + this.pageSize - 1, total);
-        
+
         $('#def-pagination-info').text(`Showing ${startIndex} to ${endIndex} of ${total.toLocaleString()} beans`);
 
         const $buttons = $('#def-pagination-buttons');
@@ -479,9 +480,11 @@ export default class Dashboard {
 
     selectBean(beanName) {
         this.selectedBeanName = beanName;
-        
+
         $('.bean-row').removeClass('bg-primary-light/40 border-l-2 border-primary font-medium');
-        $(`.bean-row[data-bean-name="${beanName}"]`).addClass('bg-primary-light/40 border-l-2 border-primary font-medium');
+        $('.bean-row').filter(function () {
+            return $(this).attr('data-bean-name') === beanName;
+        }).addClass('bg-primary-light/40 border-l-2 border-primary font-medium');
 
         const bean = this.beans.find(b => b.beanName === beanName);
         if (!bean) return;
@@ -502,7 +505,7 @@ export default class Dashboard {
         const displayName = BeanTreeBuilder._displayName(bean.beanName);
         $('#def-sidebar-name').text(displayName);
         $('#def-sidebar-type').text(bean.type || 'N/A').attr('title', bean.type || '');
-        
+
         const icon = this.getBeanIcon(bean);
         const color = this.getBeanColor(bean);
         $('#def-sidebar-icon').text(icon);
@@ -540,7 +543,7 @@ export default class Dashboard {
     _updateSidebarLists(bean) {
         const deps = bean.dependencies || [];
         const dependents = bean.dependents || [];
-        
+
         $('#def-sidebar-deps-count').text(deps.length);
         $('#def-sidebar-dependents-count').text(dependents.length);
 
@@ -637,16 +640,17 @@ export default class Dashboard {
      * @private
      */
     _bindTableAndPaginationEvents() {
+        let $paginationButton = $('#def-pagination-buttons');
         // Table clicks
         $('#beanTableBody').off('click', '.bean-row').on('click', '.bean-row', (e) => {
-            const beanName = $(e.currentTarget).data('bean-name');
+            const beanName = $(e.currentTarget).attr('data-bean-name');
             if (beanName) {
                 this.selectBean(beanName);
             }
         });
 
         // Pagination buttons
-        $('#def-pagination-buttons').off('click', '.btn-page').on('click', '.btn-page', (e) => {
+        $paginationButton.off('click', '.btn-page').on('click', '.btn-page', (e) => {
             const page = parseInt($(e.currentTarget).data('page'));
             if (!isNaN(page)) {
                 this.currentPage = page;
@@ -655,7 +659,7 @@ export default class Dashboard {
             }
         });
 
-        $('#def-pagination-buttons').off('click', '.btn-prev').on('click', '.btn-prev', () => {
+        $paginationButton.off('click', '.btn-prev').on('click', '.btn-prev', () => {
             if (this.currentPage > 1) {
                 this.currentPage--;
                 this.renderTable();
@@ -663,7 +667,7 @@ export default class Dashboard {
             }
         });
 
-        $('#def-pagination-buttons').off('click', '.btn-next').on('click', '.btn-next', () => {
+        $paginationButton.off('click', '.btn-next').on('click', '.btn-next', () => {
             const totalPages = Math.ceil(this.filteredBeans.length / this.pageSize);
             if (this.currentPage < totalPages) {
                 this.currentPage++;

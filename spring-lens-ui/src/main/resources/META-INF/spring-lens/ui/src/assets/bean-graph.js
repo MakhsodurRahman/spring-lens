@@ -1,11 +1,9 @@
 import { NW, NH, RX, GAP_X, GAP_Y, ICON, ZOOM_SCALE_EXTENT, TEMPLATES } from './constants.js';
 import { css, getBeanCategory, nodeStyle, tbLink, lrLink, tree } from './utils.js';
-import { BeanTreeBuilder } from './DataLoader.js';
+import { BeanTreeBuilder } from './bean-data-loader.js';
 
 export default class BeanGraph {
-    /**
-     * @param {DataLoader} dataLoader - Shared data service instance.
-     */
+
     constructor(dataLoader) {
         this.dataLoader = dataLoader;
         this.root = null;
