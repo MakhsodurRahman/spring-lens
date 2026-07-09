@@ -1,44 +1,58 @@
-import Router from './src/assets/Router.js';
-import DataLoader from './src/assets/DataLoader.js';
-import BeanGraph from './src/assets/BeanGraph.js';
-import Dashboard from './src/assets/Dashboard.js';
-import RequestTracker from './src/assets/RequestTracker.js';
+import Route from './src/assets/route.js';
+import BeanDataLoader from './src/assets/bean-data-loader.js';
+import BeanGraph from './src/assets/bean-graph.js';
+import BeanDefinitions from './src/assets/bean-definitions.js';
+import RequestDefinitions from './src/assets/request-definitions.js';
+import Dashboard from './src/assets/dashboard.js';
+import RequestEndpoints from './src/assets/request-endpoints.js';
 
 $(document).ready(() => {
-    const dataLoader = new DataLoader();
+    const dataLoader = new BeanDataLoader();
     const beanGraph = new BeanGraph(dataLoader);
+    const beanDefinitions = new BeanDefinitions(dataLoader);
+    const requestDefinitions = new RequestDefinitions();
     const dashboard = new Dashboard(dataLoader);
-    const requestTracker = new RequestTracker();
+    const requestEndpoints = new RequestEndpoints();
 
-    // Configure routes and instantiate Router
-    const appRouter = new Router({
+    // Configure routes and instantiate Route
+    const appRouter = new Route({
         container: '#main-content',
-        defaultRoute: 'definitions',
+        defaultRoute: 'dashboard',
         routes: {
-            'request': {
-                template: 'request',
-                onEnter: () => requestTracker.enter(),
-                onLeave: () => requestTracker.leave()
-            },
-            'definitions': {
-                template: 'definitions',
+            'dashboard': {
+                template: 'main-dashboard',
                 onEnter: () => dashboard.enter(),
                 onLeave: () => dashboard.leave()
             },
+            'request': {
+                template: 'http-request',
+                onEnter: () => requestDefinitions.enter(),
+                onLeave: () => requestDefinitions.leave()
+            },
+            'request-endpoint': {
+                template: 'request-endpoints',
+                onEnter: () => requestEndpoints.enter(),
+                onLeave: () => requestEndpoints.leave()
+            },
+            'definitions': {
+                template: 'bean-definitions',
+                onEnter: () => beanDefinitions.enter(),
+                onLeave: () => beanDefinitions.leave()
+            },
             'graph': {
-                template: 'graph',
+                template: 'bean-graph',
                 onEnter: () => beanGraph.enter(),
                 onLeave: () => beanGraph.leave()
             },
             'conditions': {
-                template: 'conditions',
-                onEnter: () => dashboard.enter(),
-                onLeave: () => dashboard.leave()
+                template: 'bean-condition-reports',
+                onEnter: () => beanDefinitions.enter(),
+                onLeave: () => beanDefinitions.leave()
             }
         }
     });
 
-    // Start Router
+    // Start Route
     appRouter.init();
 
     /* ── Resize ── */

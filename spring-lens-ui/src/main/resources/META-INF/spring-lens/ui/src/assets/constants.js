@@ -88,8 +88,8 @@ export const TEMPLATES = {
             <td class="px-5 py-3 text-center">${lazyIcon}</td>
             <td class="px-5 py-3 font-mono text-[11px] text-gray-500">${contextId || 'N/A'}</td>
             <td class="px-5 py-3 text-right">
-                <button class="text-gray-400 hover:text-gray-600">
-                    <span class="material-symbols-outlined text-[18px]">more_vert</span>
+                <button class="px-3 py-1 bg-primary/10 hover:bg-primary/20 text-primary rounded-md text-xs font-semibold transition-colors cursor-pointer btn-bean-view animate-none" data-bean-name="${beanName}">
+                    View
                 </button>
             </td>
         </tr>
@@ -104,7 +104,7 @@ export const TEMPLATES = {
     `,
     dependencyItem: ({ depName, displayName, catColor }) => `
         <div class="dep-item flex items-center justify-between py-1.5 hover:bg-gray-50 px-2 rounded-md transition-colors">
-            <div class="dep-item-left flex items-center gap-2 cursor-pointer" data-fullname="${depName}">
+            <div class="dep-item-left flex items-center gap-2 cursor-pointer def-sidebar-item-click" data-fullname="${depName}">
                 <span class="w-2 h-2 rounded-full bg-${catColor}-500"></span>
                 <span class="font-medium text-gray-700 font-mono text-[11px]">${displayName}</span>
             </div>
@@ -145,8 +145,8 @@ export const TEMPLATES = {
         </button>
     `,
     paginationPageBtn: ({ page, isActive }) => {
-        const btnClass = isActive 
-            ? 'text-white bg-primary font-medium' 
+        const btnClass = isActive
+            ? 'text-white bg-primary font-medium'
             : 'text-gray-600 hover:bg-gray-50 font-medium';
         return `
             <button class="w-7 h-7 flex items-center justify-center rounded text-xs btn-page ${btnClass}" data-page="${page}">
